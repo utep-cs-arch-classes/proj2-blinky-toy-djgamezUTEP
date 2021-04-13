@@ -8,35 +8,21 @@ void red_on_ctrl(){
 void red_off_ctrl(){
   red_on=0;
   led_changed=1;
-}
-char toggle_red()		/* always toggle! */
-{
-  static char state = 0;
 
-  switch (state) {
-  case 0:
-    red_on = 1;
-    state = 1;
-    break;
-  case 1:
-    red_on = 0;
-    state = 0;
-    break;
-  }
-  return 1;			/* always changes an led */
 }
 
-char toggle_green()	/* only toggle green if red is on!  */
-{
-  char changed = 0;
-  if (red_on==0) {
-    green_on ^= 1;
-    changed = 1;
-  }
-  return changed;
+void green_on_ctrl(){
+  green_on=1;
+  led_changed=1;
 }
 
-void med_dim(){
+void green_off_ctrl(){
+  green_on=0;
+  led_changed=1;
+}
+
+
+void med_dim_red(){
   static char cntr=0;
     if(cntr%2==0){
       red_off_ctrl();
@@ -50,7 +36,20 @@ void med_dim(){
   }
   
 }
-void med_high_dim(){
+void med_dim_green(){
+  static char cntr=0;
+  if (cntr%2==0){
+    green_off_ctrl();
+  }else{
+    green_on_ctrl();
+  }
+  cntr+=1;
+  if (cntr>100){
+    cntr=0;
+  }
+}
+  
+void med_high_dim_red(){
   static char cntr=0;
   if(cntr>2){
     red_off_ctrl();
@@ -63,6 +62,18 @@ void med_high_dim(){
   }
 }
 
+void med_high_dim_green(){
+  static char cntr=0;
+  if(cntr>2){
+    green_off_ctrl();
+  }else{
+    green_on_ctrl();
+  }
+  cntr+=1;
+  if (cntr>3){
+    cntr=0;
+  }
+}
 
 
 static char dimLvl=0;
@@ -77,13 +88,13 @@ void dimming()
   static char cntr=0;
   
   switch(dimLvl){
-  case 0:  red_off_ctrl();//off all the time
+  case 0:  red_off_ctrl(); green_on_ctrl(); //red off green on 100%
     break;
-  case 2: med_dim();
+  case 2: med_dim_red(); med_high_dim_green();
     break;
-  case 3: med_high_dim();
+  case 3: med_high_dim_red(); med_dim_green();
     break;
-  case 4: red_on_ctrl();
+  case 4: red_on_ctrl(); green_off_ctrl();
     break;
     
 
